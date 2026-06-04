@@ -5,19 +5,38 @@ class SeatStore:
     def list_seats(self):
         return self._seats.items()
 
+    def available_seats(self):
+        return [
+            (seat_id, name)
+            for seat_id, name in self._seats.items()
+            if name is None
+        ]
+
+    def reserved_seats(self):
+        return [
+            (seat_id, name)
+            for seat_id, name in self._seats.items()
+            if name is not None
+        ]
+
     def reserve(self, seat_id, name):
         current = self._get(seat_id)
+
         if current is not None:
             raise ValueError("Seat is already reserved.")
+
         self._seats[seat_id] = name
         return seat_id, name
 
     def cancel(self, seat_id, name=None):
         current = self._get(seat_id)
+
         if current is None:
             raise ValueError("Seat is not reserved.")
+
         if name and current != name:
             raise ValueError("Name does not match the reservation.")
+
         self._seats[seat_id] = None
         return seat_id, None
 
@@ -25,11 +44,21 @@ class SeatStore:
         return seat_id, self._get(seat_id)
 
     def stats(self):
-        reserved = sum(1 for name in self._seats.values() if name)
+        reserved = sum(
+            1
+            for name in self._seats.values()
+            if name is not None
+        )
         total = len(self._seats)
-        return {"total": total, "reserved": reserved, "available": total - reserved}
+
+        return {
+            "total": total,
+            "reserved": reserved,
+            "available": total - reserved,
+        }
 
     def _get(self, seat_id):
         if seat_id not in self._seats:
             raise ValueError("Seat does not exist.")
+
         return self._seats[seat_id]
