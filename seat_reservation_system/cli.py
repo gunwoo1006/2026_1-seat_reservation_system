@@ -15,6 +15,7 @@ exit - Exit the program"""
 
 
 def run_cli():
+    """좌석 예약 시스템의 명령어 입력 루프를 실행한다."""
     store = SeatStore(SEAT_IDS)
 
     print("Seat Reservation System CLI")
@@ -30,6 +31,7 @@ def run_cli():
         if not raw:
             continue
 
+        # 입력 문자열을 명령어와 인자 목록으로 분리한다.
         parts = raw.split()
         command, args = parts[0].lower(), parts[1:]
 
@@ -70,6 +72,7 @@ def run_cli():
 
             elif command == "cancel":
                 _require_args(command, args, 1)
+                # 이름 인자는 선택 사항이므로 없으면 None으로 처리한다.
                 name = args[1] if len(args) > 1 else None
                 seat_id, name = store.cancel(int(args[0]), name)
                 _print_seat(seat_id, name)
@@ -94,10 +97,12 @@ def run_cli():
 
 
 def _print_seat(seat_id, name):
+    """좌석 번호와 예약 상태를 기존 출력 형식에 맞게 출력한다."""
     label = f"reserved by {name}" if name is not None else "available"
     print(f"Seat {seat_id}: {label}")
 
 
 def _require_args(command, args, count):
+    """명령어 실행에 필요한 최소 인자 개수를 검사한다."""
     if len(args) < count:
         raise ValueError(f"Usage: {command} requires {count} argument(s).")
